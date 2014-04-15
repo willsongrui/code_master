@@ -1,5 +1,5 @@
-#ifndef word_table_h
-#define word_table_h
+#ifndef WORD_TABLE_H
+#define WORD_TABLE_H
 #include <vector>
 #include "word_item.h"
 namespace word_table
@@ -7,19 +7,19 @@ namespace word_table
 class Word_table
 {
 public:
-	Word_table(const std::vector<Word_item*>);
-	~Word_table();
-	int load_file(const char*);
-	int parse_line();
+    Word_table(const std::vector<Word_item*>);
+    ~Word_table();
+    int load_file(const char*);
+    int parse_line();
 private:
-	int read_line();
-	void split_delimter(std::vector<std::string>& mv, const std::string& delimeter);
-	std::vector<Word_item*> _value;
-	std::vector<Word_item*> _rule;
-	FILE*_file;
-	bool _ready;
-	std::string _cur_line;
-	int _word_per_line;
+    int read_line();
+    void split_delimter(std::vector<std::string>& mv, const std::string& delimeter);
+    std::vector<Word_item*> _value;
+    std::vector<Word_item*> _rule;
+    FILE* _file;
+    bool _ready;
+    std::string _cur_line;
+    int _word_per_line;
 
 
 };
