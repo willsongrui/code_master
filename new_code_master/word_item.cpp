@@ -2,12 +2,15 @@
 #include <stdlib.h>
 #include <vector>
 #include <string>
-using word_table::Word_item_base;
-using word_table::Int_word_item;
-using word_table::Float_word_item;
-using word_table::CharArray_word_item;
-using word_table::Array_word_item;
-using std::vectoc;
+#include <cmath>
+#include "check_word_item.h"
+using ps_word_table::Word_item_base;
+using ps_word_table::Int_word_item;
+using ps_word_table::Float_word_item;
+using ps_word_table::CharArray_word_item;
+using ps_word_table::Array_word_item;
+using ps_word_table::Check_word_item;
+using std::vector;
 using std::string;
 
 int Int_word_item::parse(const string& str)
@@ -17,7 +20,7 @@ int Int_word_item::parse(const string& str)
         return -1;
     }
 
-    long int ret = strtol(str.c_str());
+    long int ret = strtol(str.c_str(), NULL, 10);
 
     if ((ret == LONG_MAX || ret == LONG_MIN))
     {
@@ -33,6 +36,12 @@ Int_word_item* Int_word_item::getInstance()
     return new Int_word_item();
 }
 
+Int_word_item::~Int_word_item()
+{
+
+}
+
+
 int Float_word_item::parse(const std::string& str)
 {
     if (Check_word_item::is_float(str) == false)
@@ -40,11 +49,11 @@ int Float_word_item::parse(const std::string& str)
         return -1;
     }
 
-    float ret = strtof(str.c_str());
+    float ret = strtof(str.c_str(), NULL);
 
     if (ret == HUGE_VALF || ret == HUGE_VALL)
     {
-        returun - 1;
+        return - 1;
     }
 
     _value = ret;
@@ -54,6 +63,11 @@ int Float_word_item::parse(const std::string& str)
 Float_word_item* Float_word_item::getInstance()
 {
     return new Float_word_item();
+}
+
+Float_word_item::~Float_word_item()
+{
+
 }
 
 CharArray_word_item::CharArray_word_item()
@@ -80,6 +94,20 @@ int CharArray_word_item::parse(const string& str)
     }
 }
 
+CharArray_word_item::~CharArray_word_item()
+{
+
+}
+
+Array_word_item::Array_word_item(const Array_word_item& item) : _array_element_num(item._array_element_num)
+{
+    for(int i = 0; i < item._value.size(); i++)
+    {
+        _value.push_back(item._value[i]);
+    }
+    
+
+}
 int Array_word_item::parse(const string& str)
 {
     string maohao(":");
@@ -90,21 +118,22 @@ int Array_word_item::parse(const string& str)
         return -1;
     }
 
-    string num_str = str.substr(0, maohao);
+    string num_str = str.substr(0, maohao_pos);
 
     if (Check_word_item::is_int(num_str) == false)
     {
         return -1;
     }
 
-    Int_word_item num_item = Int_word_item();
+    Int_word_item* num_item = new Int_word_item();
 
-    if (num_item.parse(num_str) < 0)
+    if (num_item->parse(num_str) < 0)
     {
         return -1;
     }
 
-    _array_element_num = num_item.get_value();
+    _array_element_num = num_item->get_value();
+    delete num_item;
     string douhao(",");
     int douhao_pos;
     int beg = maohao_pos + 1;
@@ -128,12 +157,12 @@ int Array_word_item::parse(const string& str)
 
     for (int i = 0; i < mv.size(); i++)
     {
-        if (is_int(mv[i]) == false)
+        if (Check_word_item::is_int(mv[i]) == false)
         {
             is_int = false;
         }
 
-        if (is_float(mv[i]) == false)
+        if (Check_word_item::is_float(mv[i]) == false)
         {
             is_float = false;
         }
@@ -172,7 +201,11 @@ int Array_word_item::parse(const string& str)
 
     return 0;
 }
-
+Array_word_item* Array_word_item::getInstance()
+{
+    Array_word_item* new_array_word_item = new Array_word_item(*this);
+    return new_array_word_item;
+}
 Array_word_item::~Array_word_item()
 {
     for (int i = 0; i < _value.size(); i++)

@@ -1,16 +1,47 @@
-#include "word_table"
+#include "word_table.h"
 #include <stdio.h>
 #include <stdexcept>
-using word_table::Word_table;
-Word_table::Word_table(const vector<Word_item*> mv) : _file(NULL), _ready(false)
+#include "word_item.h"
+#include <vector>
+#include <string>
+#include <iostream>
+using ps_word_table::Word_table;
+using std::vector;
+using std::string;
+using std::endl;
+using std::cout;
+Word_table::Word_table(const vector<Word_item_base*>& mv) : _file(NULL), _ready(false)
 {
     for (int i = 0; i < mv.size(); i++)
     {
-        Word_item* item = mv[i]->getInstance();
+        Word_item_base* item = mv[i]->getInstance();
         _rule.push_back(item);
     }
-
     _word_per_line = _rule.size();
+    
+    cout<<"after"<<endl;
+}
+
+Word_table::~Word_table()
+{
+    for(int i = 0; i < _value.size(); i++)
+    {
+        delete _value[i];
+        _value[i] = NULL;
+    }
+
+    for(int i = 0; i < _rule.size(); i++)
+    {
+        delete _rule[i];
+        _rule[i] = NULL;
+    }
+    if(NULL != _file)
+    {
+        fclose(_file);
+        _file = NULL;
+    }
+
+
 }
 
 int Word_table::load_file(const char* filename)
@@ -74,10 +105,10 @@ void Word_table::split_delimeter(vector<string>& mv, const string& delimeter)
 {
     int beg = 0;
     int pos;
-
-    while ((pos = _cur_line.find(delimeter, beg) != string::npos)
-{
-    mv.push_back(_cur_line.substr(beg, pos - beg));
+ 
+    while ((pos = _cur_line.find(delimeter, beg)) != string::npos)
+    {
+        mv.push_back(_cur_line.substr(beg, pos - beg));
         beg = pos + delimeter.length();
     }
     mv.push_back(_cur_line.substr(beg));
@@ -104,7 +135,7 @@ int Word_table::parse_line()
 
     for (int i = 0; i < vec_size; i++)
     {
-        int ret = _rule[i].parse(split_vec[i]);
+        int ret = _rule[i]->parse(split_vec[i]);
 
         if (ret < 0)
         {

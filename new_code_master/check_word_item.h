@@ -1,7 +1,7 @@
 #ifndef _CHECK_WORD_ITEM_H
 #define _CHECK_WORD_ITEM_H
 #include <string>
-namespace word_table
+namespace ps_word_table
 {
 class Check_word_item
 {
